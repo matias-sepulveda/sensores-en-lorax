@@ -17,7 +17,6 @@
 #define pin_humedad 0
 #define tipo_sensor DHT11
 
-#define pin 25
 #define factor 1000000 //Factor de conversión de segundos a microsegundos
 
 
@@ -150,10 +149,6 @@ void setup(){
   pantalla.setFont(u8x8_font_pxplusibmcgathin_r); //estableciendo la fuente de letras a usar
   sensor_humedad.begin(); //inicializamos el sensor de humedad
   sensor_temperatura.begin(); //inicializamos el sensor de temperatura
-
-  //haciendo que se encienda el led cuando inicia
-  pinMode(pin,OUTPUT);
-  digitalWrite(pin, HIGH);
   
   delay(1000); //Esperando a que se abra el monitor serial
 }
@@ -171,5 +166,5 @@ void loop(){
   mostrarPantalla(temperatura, humedad, voltaje); //mostrando los datos por pantalla
   
   delay(5000); //delay para poder leer los datos de la pantalla
-  suspender(60); //recibe como argumento el tiempo en segundos que se quiere mantener suspendida la placa
+  suspender(5); //recibe como argumento el tiempo en segundos que se quiere mantener suspendida la placa
 }
