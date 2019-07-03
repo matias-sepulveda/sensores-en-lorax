@@ -4,12 +4,11 @@
  *  -DallasTemperature y OneWire para el sensor de temperatura
  *  -U8g2 para la pantalla
  */
- 
+ #include <heltec.h>
 #include <U8x8lib.h>
 #include <DHT.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
 //sensor de temperatura
 #define pin_temperatura 22
 
@@ -18,6 +17,7 @@
 #define tipo_sensor DHT11
 
 #define factor 1000000 //Factor de conversión de segundos a microsegundos
+#define BAND 433E6  //you can set band here directly,e.g. 868E6,915E6
 
 
 byte voltajeBateria = 13; //pin del que se lee el voltaje de la batería
@@ -68,6 +68,8 @@ void suspender(int tiempo) {
   
   Serial.flush(); //esperando a que se termine de transmitir cualquier dato pendiente a través del puerto serial
 
+  LoRa.end();
+  LoRa.sleep();
   esp_deep_sleep_start(); //buenas noches
   }
 
@@ -77,7 +79,6 @@ float medirBateria() {
   digitalWrite(pin_actLectura, LOW); //Abriendo el transistor del circuito de la batería y poder tomar una muestra
   delay(500); //esperando a que se estabilice
   float voltaje = analogRead(voltajeBateria)/495.79611650485; //Tomando una muestra del voltaje que circula por el circuito de la batería y escalandola
-  digitalWrite(pin_actLectura, HIGH); //Cerrando el transistor para ahorrar energía
   
   return voltaje;
   }
@@ -141,7 +142,8 @@ void mostrarPantalla(float temperatura, float humedad, float voltaje) {
   }
   
 void setup(){
-
+  
+  Heltec.begin(false /*DisplayEnable Enable*/, true /*LoRa Disable*/, false /*Serial Enable*/, false /*PABOOST Enable*/, BAND /*long BAND*/);
   pinMode(pin_actLectura, OUTPUT);
   pinMode(voltajeBateria, INPUT);
   Serial.begin(9600);
@@ -149,8 +151,20 @@ void setup(){
   pantalla.setFont(u8x8_font_pxplusibmcgathin_r); //estableciendo la fuente de letras a usar
   sensor_humedad.begin(); //inicializamos el sensor de humedad
   sensor_temperatura.begin(); //inicializamos el sensor de temperatura
+  pinMode(5, INPUT);
+  pinMode(14,INPUT);
   
+  //pinMode(15,INPUT);
+  //pinMode(16,INPUT);
+  //pinMode(17,INPUT);
+  pinMode(18,INPUT);
+  pinMode(19,INPUT);
+
+  pinMode(26,INPUT);
+  pinMode(27,INPUT);
   delay(1000); //Esperando a que se abra el monitor serial
+
+
 }
 
 
@@ -165,6 +179,6 @@ void loop(){
   pSerial(temperatura, humedad, voltaje); //mostrando los datos por el puerto serial
   mostrarPantalla(temperatura, humedad, voltaje); //mostrando los datos por pantalla
   
-  delay(5000); //delay para poder leer los datos de la pantalla
+  delay(10000); //delay para poder leer los datos de la pantalla
   suspender(5); //recibe como argumento el tiempo en segundos que se quiere mantener suspendida la placa
 }
