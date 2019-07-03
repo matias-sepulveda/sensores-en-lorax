@@ -4,11 +4,13 @@
  *  -DallasTemperature y OneWire para el sensor de temperatura
  *  -U8g2 para la pantalla
  */
- #include <heltec.h>
-#include <U8x8lib.h>
+ 
+#include <heltec.h> //para poder usar la función heltec.begin()
+#include <U8x8lib.h> 
 #include <DHT.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+
 //sensor de temperatura
 #define pin_temperatura 22
 
@@ -17,7 +19,7 @@
 #define tipo_sensor DHT11
 
 #define factor 1000000 //Factor de conversión de segundos a microsegundos
-#define BAND 433E6  //you can set band here directly,e.g. 868E6,915E6
+#define BAND 433E6  //LoRa
 
 
 byte voltajeBateria = 13; //pin del que se lee el voltaje de la batería
@@ -54,9 +56,10 @@ void print_wakeup_reason(){
 void suspender(int tiempo) {
   
   pantalla.setPowerSave(true); //Poniendo la pantalla en modo ahorro de energía, este modo se desactiva automáticamente al salir
-                               //del modo suspensión cuando se ejecuta pantalla.begin()
+                               //de la suspensión cuando se ejecuta pantalla.begin() en la función setup()
   
-  contador++;
+  contador++; //contando las veces que ha despertado
+  
   Serial.println("Arranque número: " + String(contador));
   print_wakeup_reason(); //muestra por qué salió de la suspensión
 
@@ -144,27 +147,33 @@ void mostrarPantalla(float temperatura, float humedad, float voltaje) {
 void setup(){
   
   Heltec.begin(false /*DisplayEnable Enable*/, true /*LoRa Disable*/, false /*Serial Enable*/, false /*PABOOST Enable*/, BAND /*long BAND*/);
-  pinMode(pin_actLectura, OUTPUT);
-  pinMode(voltajeBateria, INPUT);
-  Serial.begin(9600);
-  pantalla.begin(); //inicializando la pantalla 
-  pantalla.setFont(u8x8_font_pxplusibmcgathin_r); //estableciendo la fuente de letras a usar
-  sensor_humedad.begin(); //inicializamos el sensor de humedad
-  sensor_temperatura.begin(); //inicializamos el sensor de temperatura
+
+  /* 
+   *  Estos pines (que son los que usa LoRa) no tengo idea de porque hay que declararlos como INPUT, pero si no se declaran 
+   *  junto con la función Heltec.begin el consumo de la placa en modo deep_sleep aumenta hasta los 2.1-2.3 mA
+   */
+   
   pinMode(5, INPUT);
-  pinMode(14,INPUT);
-  
-  //pinMode(15,INPUT);
-  //pinMode(16,INPUT);
-  //pinMode(17,INPUT);
+  pinMode(14,INPUT);  
   pinMode(18,INPUT);
   pinMode(19,INPUT);
-
   pinMode(26,INPUT);
   pinMode(27,INPUT);
+
+  pinMode(pin_actLectura, OUTPUT);
+  pinMode(voltajeBateria, INPUT);
+  
+  Serial.begin(9600);
+  
+  pantalla.begin(); //inicializando la pantalla 
+  pantalla.setFont(u8x8_font_pxplusibmcgathin_r); //estableciendo la fuente de letras a usar
+  
+  sensor_humedad.begin(); //inicializamos el sensor de humedad
+  sensor_temperatura.begin(); //inicializamos el sensor de temperatura
+
+
   delay(1000); //Esperando a que se abra el monitor serial
-
-
+  
 }
 
 
