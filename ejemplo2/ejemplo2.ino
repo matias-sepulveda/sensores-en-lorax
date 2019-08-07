@@ -41,13 +41,13 @@ void setup(){
 }
 
 
-void loop(){
+void loop(){ //aquí comienza todo
   
-  sensor_temperatura.requestTemperatures();
+  sensor_temperatura.requestTemperatures(); //solicitando los datos al sensor de temperatura
   
-  float temperatura = sensor_temperatura.getTempCByIndex(0);
+  float temperatura = sensor_temperatura.getTempCByIndex(0); //guardando los datos en la variable temperatura
   
-  float humedad = sensor_humedad.readHumidity();
+  float humedad = sensor_humedad.readHumidity(); //solicitando y guardando los datos del sensor de humedad
 
   //mostrando por el puerto serial                                                                         
   Serial.print("Temperatura: ");
@@ -64,9 +64,8 @@ void loop(){
   pantalla.setCursor(6, 1);
   pantalla.print(temperatura);
   pantalla.drawString(12, 1, "C*");
-
-  
-  pantalla.drawString(0, 2, "Humedad: ");
+ 
+  pantalla.drawString(0, 2, "Humedad: "); //humedad
   pantalla.setCursor(9, 2);
   pantalla.print(humedad);
   pantalla.drawString(13, 2, " %");
